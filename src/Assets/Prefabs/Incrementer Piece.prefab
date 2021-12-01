@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 6118103599709165630}
   - component: {fileID: 6118103599709165627}
   m_Layer: 0
-  m_Name: Number
+  m_Name: Plus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -81,6 +81,7 @@ MeshRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
@@ -143,8 +144,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4289239175
-  m_fontColor: {r: 0.53028905, g: 0.5951445, b: 0.66, a: 1}
+    rgba: 4286155305
+  m_fontColor: {r: 0.16078432, g: 0.5411765, b: 0.4745098, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -200,11 +201,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
+  _SortingLayer: 0
+  _SortingLayerID: 0
+  _SortingOrder: 0
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 6118103599709165630}
   m_maskType: 0
-  _SortingLayerID: 0
-  _SortingOrder: 0
 --- !u!1 &6118103600336575496
 GameObject:
   m_ObjectHideFlags: 0
@@ -247,6 +249,7 @@ SpriteRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -277,7 +280,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 4739f0c6314eeb24c95b232fa9bb473e, type: 3}
-  m_Color: {r: 0.52953494, g: 0.59476745, b: 0.66, a: 1}
+  m_Color: {r: 0.16237763, g: 0.54, b: 0.47580418, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -329,6 +332,7 @@ SpriteRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -359,7 +363,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 4739f0c6314eeb24c95b232fa9bb473e, type: 3}
-  m_Color: {r: 0.704, g: 0.792, b: 0.88, a: 1}
+  m_Color: {r: 0.21842697, g: 0.72, b: 0.6391011, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

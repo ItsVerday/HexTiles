@@ -34,7 +34,7 @@ public class ComboManager : MonoBehaviour
             }
             else
             {
-                float comboColorLerp = 1.0f - Mathf.Pow(1.0f - 0.99f, Time.deltaTime);
+                float comboColorLerp = 1.0f - Mathf.Pow(1.0f - 0.95f, Time.deltaTime);
                 comboColor = comboColor * (1.0f - comboColorLerp) + Manager.instance.getComboColor(combo) * comboColorLerp;
                 comboText.text = "Combo x" + string.Format("{0:#,##0.##}", combo);
                 comboText.color = comboColor;
@@ -64,7 +64,36 @@ public class ComboManager : MonoBehaviour
         }
         else
         {
-            comboAnimation = TweenFactory.Tween(null, 1.05f, 1.0f, 0.2f, TweenScaleFunctions.QuadraticEaseIn, t =>
+            float scl = 1.05f;
+            if (combo + 1 >= 20)
+            {
+                if ((combo + 1) % 10 == 0)
+                {
+                    scl = 1.06f;
+                }
+
+                if ((combo + 1) % 25 == 0)
+                {
+                    scl = 1.07f;
+                }
+
+                if ((combo + 1) % 50 == 0)
+                {
+                    scl = 1.08f;
+                }
+
+                if ((combo + 1) % 100 == 0)
+                {
+                    scl = 1.09f;
+                }
+
+                if ((combo + 1) % 250 == 0)
+                {
+                    scl = 1.1f;
+                }
+            }
+
+            comboAnimation = TweenFactory.Tween(null, scl, 1.0f, 0.2f, TweenScaleFunctions.QuadraticEaseIn, t =>
             {
                 scaleMult = t.CurrentValue;
             });

@@ -90,30 +90,28 @@ public class Board : MonoBehaviour
             if (!forceNewSave && SaveManager.loadBoard(this, Manager.instance.getBoardSaveName()))
             {
                 Debug.Log("Save loaded");
-
                 save();
             }
             else
             {
                 Debug.Log("No save found");
-
-                placeRandomPiece();
-                placeRandomPiece();
-                placeRandomPiece();
-
-                save();
+                newGame();
             }
         }
         catch
         {
-            Debug.Log("Error loading save!");
-
-            placeRandomPiece();
-            placeRandomPiece();
-            placeRandomPiece();
-
-            save();
+            Debug.Log("Error loading save");
+            newGame();
         }
+    }
+    
+    public void newGame()
+    {
+        placeRandomPiece(new Manager.StandardPieceType(1));
+        placeRandomPiece(new Manager.StandardPieceType(1));
+        placeRandomPiece(new Manager.StandardPieceType(1));
+
+        save();
     }
 
     GameObject getTile(int x, int y)
@@ -134,14 +132,14 @@ public class Board : MonoBehaviour
         float scale = this.scale * Mathf.Min(768f, container.rect.width / container.rect.height * 768f) / 768f;
         transform.localScale = new Vector3(scale, scale, scale);
 
-        float displayScoreLerp = 1.0f - Mathf.Pow(1.0f - 0.98f, Time.deltaTime);
+        float displayScoreLerp = 1.0f - Mathf.Pow(1.0f - 0.95f, Time.deltaTime);
         displayScore = displayScore * (1.0f - displayScoreLerp) + score * displayScoreLerp;
         if (score - displayScore < 0.5f)
         {
             displayScore = score;
         }
 
-        float scoreColorLerp = 1.0f - Mathf.Pow(1.0f - 0.99f, Time.deltaTime);
+        float scoreColorLerp = 1.0f - Mathf.Pow(1.0f - 0.999f, Time.deltaTime);
         scoreColor = scoreColor * (1.0f - scoreColorLerp) + Manager.instance.getPieceColor(highest) * scoreColorLerp;
 
         scoreText.text = string.Format("{0:#,##0.##}", Math.Floor(displayScore));

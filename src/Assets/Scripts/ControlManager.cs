@@ -29,7 +29,7 @@ public class ControlManager : MonoBehaviour
 
     public void move(Board board)
     {
-        if (timeSinceLastMove < 0.05f)
+        if (timeSinceLastMove < (SystemInfo.deviceType == DeviceType.Handheld ? 0.2f : 0.05f))
         {
             return;
         }
