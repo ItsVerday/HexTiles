@@ -323,7 +323,7 @@ public class Board : MonoBehaviour
                             tile.unsetPiece();
                             neighborTile.setPiece(piece);
 
-                            Vector2 vector = Manager.instance.directionVector(direction) * 0.05f;
+                            Vector2 vector = Manager.instance.directionVector(direction) * 0.1f;
                             Piece pieceComponent = piece.GetComponent<Piece>();
                             pieceComponent.animationOffset = vector;
                         }
@@ -538,7 +538,6 @@ public class Board : MonoBehaviour
                             return;
                         }
 
-                        piece.transform.localPosition = t.CurrentValue;
                         piece.transform.localPosition = t.CurrentValue;
                     });
 
