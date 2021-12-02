@@ -569,7 +569,7 @@ public class Manager : MonoBehaviour
 
         public override float getComboMultiplier(int combo)
         {
-            return Mathf.Min(Mathf.Pow(combo + 1f, 0.3f), 10f);
+            return Mathf.Min(Mathf.Pow(combo + 1f, 0.5f), 15f);
         }
     }
 
@@ -615,7 +615,7 @@ public class Manager : MonoBehaviour
 
         public override float getComboMultiplier(int combo)
         {
-            return Mathf.Min(Mathf.Pow(combo + 1f, 0.2f), 8f);
+            return Mathf.Min(Mathf.Pow(combo + 1f, 0.7f), 20f);
         }
     }
 
@@ -670,7 +670,7 @@ public class Manager : MonoBehaviour
 
         public override float getComboMultiplier(int combo)
         {
-            return Mathf.Min(Mathf.Pow(combo + 1f, 0.4f), 12f);
+            return Mathf.Min(Mathf.Pow(combo + 1f, 0.3f), 12f);
         }
     }
 }

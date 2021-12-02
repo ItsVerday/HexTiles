@@ -29,6 +29,7 @@
         // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
         // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
       }).then(i => setInterval(() => {
+        // Make it so saving actually works, otherwise it doesn't (Unity bug probably)
         i.Module.asmLibraryArg._JS_FileSystem_Sync()
       }, 1));
     </script>
