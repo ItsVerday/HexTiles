@@ -15,7 +15,7 @@ public class Manager : MonoBehaviour
     public GameObject incrementerPiecePrefab;
 
     public Board board;
-    public GameMode gameMode = new HardcoreGameMode();
+    public GameMode gameMode = new NormalGameMode();
 
     public int boardSize;
     public float tileScale;
@@ -24,6 +24,27 @@ public class Manager : MonoBehaviour
     {
         if (instance == null)
         {
+            if (Application.platform == RuntimePlatform.WebGLPlayer)
+            {
+                string mode;
+                URLParameters.GetSearchParameters().TryGetValue("mode", out mode);
+                if (mode == null)
+                {
+                    mode = "normal";
+                }
+
+                if (mode.ToLower() == "normal")
+                {
+                    gameMode = new NormalGameMode();
+                } else if (mode.ToLower() == "hardcore")
+                {
+                    gameMode = new HardcoreGameMode();
+                } else if (mode.ToLower() == "zen")
+                {
+                    gameMode = new ZenGameMode();
+                }
+            }
+
             instance = this;
             board.scale = 5f / (2 * boardSize + 1);
         }
@@ -88,10 +109,15 @@ public class Manager : MonoBehaviour
     public Color getPieceColor(int number)
     {
         float blend = Mathf.Floor((number - 1) / PIECE_COLORS.Count);
-        number = (number - 1) % PIECE_COLORS.Count;
+        int numberMod = (number - 1) % PIECE_COLORS.Count;
         blend %= 5;
         blend /= 4;
-        return PIECE_COLORS[number] * (1 - blend) + END_PIECE_COLORS[number] * blend;
+        Color lerped = PIECE_COLORS[numberMod] * (1 - blend) + END_PIECE_COLORS[numberMod] * blend;
+        float h, s, v;
+        Color.RGBToHSV(lerped, out h, out s, out v);
+        h += 0.618f * 0.25f * (number / 60);
+        h %= 1;
+        return Color.HSVToRGB(h, s, v);
     }
 
     public static List<Color> COMBO_COLORS = new List<Color>()
@@ -503,9 +529,9 @@ public class Manager : MonoBehaviour
         {
             float highest = board.highest;
             float f = highest - 0.5f * Mathf.Log(highest);
-            float rangeLow = Mathf.Floor(f - 0.4f * Mathf.Sqrt(f));
+            float rangeLow = Mathf.Floor(f - 0.5f * Mathf.Pow(Mathf.Log(highest), 1.5f));
             float rangeHigh = Mathf.Ceil(f);
-            int number = (int)Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
+            int number = (int) Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
 
             Vector2Int lowestPiece = board.lowestPieceCount();
             if (lowestPiece.x < rangeLow && lowestPiece.y == 1)
@@ -557,10 +583,10 @@ public class Manager : MonoBehaviour
         public override PieceType spawnPiece(Board board)
         {
             float highest = board.highest * 0.9f;
-            float f = highest - 0.6f * Mathf.Log(highest);
-            float rangeLow = Mathf.Floor(f - 0.5f * Mathf.Sqrt(f));
+            float f = highest - 0.6f * Mathf.Pow(Mathf.Log(highest), 1.1f);
+            float rangeLow = Mathf.Floor(f - 0.4f * Mathf.Pow(f, 0.47f));
             float rangeHigh = Mathf.Ceil(f);
-            int number = (int)Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
+            int number = (int) Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
 
             PieceType pieceType = new StandardPieceType(number);
 
@@ -603,10 +629,10 @@ public class Manager : MonoBehaviour
         public override PieceType spawnPiece(Board board)
         {
             float highest = board.highest;
-            float f = highest - 0.4f * Mathf.Log(highest);
-            float rangeLow = Mathf.Floor(f - 0.3f * Mathf.Sqrt(f));
+            float f = highest - 0.4f * Mathf.Pow(Mathf.Log(highest), 0.75f);
+            float rangeLow = Mathf.Floor(f - 0.3f * Mathf.Pow(f, 0.45f));
             float rangeHigh = Mathf.Ceil(f);
-            int number = (int)Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
+            int number = (int) Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
 
             Vector2Int lowestPiece = board.lowestPieceCount();
             if (lowestPiece.x < rangeLow && lowestPiece.y == 1)
