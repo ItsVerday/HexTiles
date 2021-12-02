@@ -6,14 +6,12 @@ public class ControlManager : MonoBehaviour
 {
     public Manager.Direction direction = Manager.Direction.UP_RIGHT;
     public bool shouldMove = false;
-    public float timeSinceLastMove;
 
     public Vector2 touchStart;
 
     // Update is called once per frame
     void Update()
     {
-        timeSinceLastMove += Time.deltaTime;
         switch (SystemInfo.deviceType)
         {
             case DeviceType.Desktop:
@@ -29,17 +27,11 @@ public class ControlManager : MonoBehaviour
 
     public void move(Board board)
     {
-        if (timeSinceLastMove < (SystemInfo.deviceType == DeviceType.Handheld ? 0.2f : 0.05f))
-        {
-            return;
-        }
-
         if (shouldMove)
         {
             board.move(direction);
 
             shouldMove = false;
-            timeSinceLastMove = 0f;
         }
     }
 

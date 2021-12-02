@@ -15,7 +15,7 @@ public class Manager : MonoBehaviour
     public GameObject incrementerPiecePrefab;
 
     public Board board;
-    public GameMode gameMode = new NormalGameMode();
+    public GameMode gameMode = new HardcoreGameMode();
 
     public int boardSize;
     public float tileScale;
@@ -544,17 +544,41 @@ public class Manager : MonoBehaviour
 
             PieceType pieceType = new StandardPieceType(number);
 
-            if (Random.value < 0.05f && highest >= 12)
+            if (Random.value < 0.1f && highest >= 40)
+            {
+                pieceType = new BombPieceType(number);
+            }
+            else if (Random.value < 0.07f && highest >= 20)
+            {
+                pieceType = new BombPieceType(number);
+            }
+            else if (Random.value < 0.05f && highest >= 12)
             {
                 pieceType = new BombPieceType(number);
             }
 
-            if (Random.value < 0.1f && highest >= 7)
+            if (Random.value < 0.16f && highest >= 30)
+            {
+                pieceType = new WallPieceType();
+            }
+            else if (Random.value < 0.13f && highest >= 18)
+            {
+                pieceType = new WallPieceType();
+            }
+            else if (Random.value < 0.1f && highest >= 7)
             {
                 pieceType = new WallPieceType();
             }
 
-            if (Random.value < 0.04f && highest >= 19)
+            if (Random.value < 0.1f && highest >= 50)
+            {
+                pieceType = new IncrementerPieceType();
+            }
+            else if (Random.value < 0.07f && highest >= 35)
+            {
+                pieceType = new IncrementerPieceType();
+            }
+            else if (Random.value < 0.04f && highest >= 19)
             {
                 pieceType = new IncrementerPieceType();
             }
@@ -590,17 +614,41 @@ public class Manager : MonoBehaviour
 
             PieceType pieceType = new StandardPieceType(number);
 
-            if (Random.value < 0.025f && highest >= 15)
+            if (Random.value < 0.07f && highest >= 25)
+            {
+                pieceType = new BombPieceType(number);
+            }
+            else if (Random.value < 0.05f && highest >= 14)
+            {
+                pieceType = new BombPieceType(number);
+            }
+            else if (Random.value < 0.025f && highest >= 9)
             {
                 pieceType = new BombPieceType(number);
             }
 
-            if (Random.value < 0.15f && highest >= 1)
+            if (Random.value < 0.15f && highest >= 20)
+            {
+                pieceType = new WallPieceType();
+            }
+            else if (Random.value < 0.11f && highest >= 11)
+            {
+                pieceType = new WallPieceType();
+            }
+            else if (Random.value < 0.08f && highest >= 4)
             {
                 pieceType = new WallPieceType();
             }
 
-            if (Random.value < 0.02f && highest >= 25)
+            if (Random.value < 0.05f && highest >= 40)
+            {
+                pieceType = new IncrementerPieceType();
+            }
+            else if (Random.value < 0.035f && highest >= 29)
+            {
+                pieceType = new IncrementerPieceType();
+            }
+            else if (Random.value < 0.02f && highest >= 20)
             {
                 pieceType = new IncrementerPieceType();
             }
@@ -645,17 +693,41 @@ public class Manager : MonoBehaviour
 
             PieceType pieceType = new StandardPieceType(number);
 
-            if (Random.value < 0.08f && highest >= 10)
+            if (Random.value < 0.12f && highest >= 28)
+            {
+                pieceType = new BombPieceType(number);
+            }
+            if (Random.value < 0.09f && highest >= 18)
+            {
+                pieceType = new BombPieceType(number);
+            }
+            else if (Random.value < 0.07f && highest >= 10)
             {
                 pieceType = new BombPieceType(number);
             }
 
-            if (Random.value < 0.05f && highest >= 12)
+            if (Random.value < 0.04f && highest >= 30)
+            {
+                pieceType = new WallPieceType();
+            }
+            else if (Random.value < 0.03f && highest >= 20)
+            {
+                pieceType = new WallPieceType();
+            }
+            else if (Random.value < 0.02f && highest >= 12)
             {
                 pieceType = new WallPieceType();
             }
 
-            if (Random.value < 0.07f && highest >= 14)
+            if (Random.value < 0.14f && highest >= 40)
+            {
+                pieceType = new IncrementerPieceType();
+            }
+            else if (Random.value < 0.1f && highest >= 25)
+            {
+                pieceType = new IncrementerPieceType();
+            }
+            else if (Random.value < 0.07f && highest >= 14)
             {
                 pieceType = new IncrementerPieceType();
             }
