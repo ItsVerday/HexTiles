@@ -18,7 +18,7 @@ public class ControlManager : MonoBehaviour
         {
             case DeviceType.Desktop:
                 keyboardControls();
-                touchControls();
+                mouseControls();
                 break;
 
             case DeviceType.Handheld:
@@ -98,17 +98,18 @@ public class ControlManager : MonoBehaviour
                 touchControlsDelta(delta);
             }
         }
-        else
+    }
+
+    public void mouseControls()
+    {
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                touchStart = Input.mousePosition;
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                Vector2 delta = (Vector2) Input.mousePosition - touchStart;
-                touchControlsDelta(delta);
-            }
+            touchStart = Input.mousePosition;
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            Vector2 delta = (Vector2)Input.mousePosition - touchStart;
+            touchControlsDelta(delta);
         }
     }
 

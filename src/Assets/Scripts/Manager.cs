@@ -528,8 +528,8 @@ public class Manager : MonoBehaviour
         public override PieceType spawnPiece(Board board)
         {
             float highest = board.highest;
-            float f = highest - 0.5f * Mathf.Log(highest);
-            float rangeLow = Mathf.Floor(f - 0.5f * Mathf.Pow(Mathf.Log(highest), 1.5f));
+            float f = highest - 0.5f * Mathf.Pow(Mathf.Log(highest), 1.1f);
+            float rangeLow = Mathf.Floor(f - 0.4f * Mathf.Pow(f, 0.47f));
             float rangeHigh = Mathf.Ceil(f);
             int number = (int) Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
 
@@ -583,8 +583,8 @@ public class Manager : MonoBehaviour
         public override PieceType spawnPiece(Board board)
         {
             float highest = board.highest * 0.9f;
-            float f = highest - 0.6f * Mathf.Pow(Mathf.Log(highest), 1.1f);
-            float rangeLow = Mathf.Floor(f - 0.4f * Mathf.Pow(f, 0.47f));
+            float f = highest - 0.6f * Mathf.Pow(Mathf.Log(highest), 1.3f);
+            float rangeLow = Mathf.Floor(f - 0.5f * Mathf.Pow(f, 0.49f));
             float rangeHigh = Mathf.Ceil(f);
             int number = (int) Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
 
