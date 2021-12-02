@@ -15,7 +15,7 @@ public class Manager : MonoBehaviour
     public GameObject incrementerPiecePrefab;
 
     public Board board;
-    public GameMode gameMode = new HardcoreGameMode();
+    public GameMode gameMode = new NormalGameMode();
 
     public int boardSize;
     public float tileScale;
@@ -544,15 +544,15 @@ public class Manager : MonoBehaviour
 
             PieceType pieceType = new StandardPieceType(number);
 
-            if (Random.value < 0.1f && highest >= 40)
+            if (Random.value < 0.045f && highest >= 40)
             {
                 pieceType = new BombPieceType(number);
             }
-            else if (Random.value < 0.07f && highest >= 20)
+            else if (Random.value < 0.035f && highest >= 20)
             {
                 pieceType = new BombPieceType(number);
             }
-            else if (Random.value < 0.05f && highest >= 12)
+            else if (Random.value < 0.025f && highest >= 12)
             {
                 pieceType = new BombPieceType(number);
             }
@@ -614,15 +614,15 @@ public class Manager : MonoBehaviour
 
             PieceType pieceType = new StandardPieceType(number);
 
-            if (Random.value < 0.07f && highest >= 25)
+            if (Random.value < 0.04f && highest >= 25)
             {
                 pieceType = new BombPieceType(number);
             }
-            else if (Random.value < 0.05f && highest >= 14)
+            else if (Random.value < 0.03f && highest >= 14)
             {
                 pieceType = new BombPieceType(number);
             }
-            else if (Random.value < 0.025f && highest >= 9)
+            else if (Random.value < 0.02f && highest >= 9)
             {
                 pieceType = new BombPieceType(number);
             }
@@ -693,15 +693,15 @@ public class Manager : MonoBehaviour
 
             PieceType pieceType = new StandardPieceType(number);
 
-            if (Random.value < 0.12f && highest >= 28)
+            if (Random.value < 0.05f && highest >= 28)
             {
                 pieceType = new BombPieceType(number);
             }
-            if (Random.value < 0.09f && highest >= 18)
+            if (Random.value < 0.04f && highest >= 18)
             {
                 pieceType = new BombPieceType(number);
             }
-            else if (Random.value < 0.07f && highest >= 10)
+            else if (Random.value < 0.03f && highest >= 10)
             {
                 pieceType = new BombPieceType(number);
             }
