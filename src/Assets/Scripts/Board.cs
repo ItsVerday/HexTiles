@@ -87,7 +87,7 @@ public class Board : MonoBehaviour
 
         try
         {
-            if (!forceNewSave && SaveManager.loadBoard(this, Manager.instance.getBoardSaveName()))
+            if (!forceNewSave && !Manager.forceReset && SaveManager.loadBoard(this, Manager.instance.getBoardSaveName()))
             {
                 Debug.Log("Save loaded");
                 save();

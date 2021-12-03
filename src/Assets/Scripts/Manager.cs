@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class Manager : MonoBehaviour
 {
     public static Manager instance = null;
+    public static bool forceReset = false;
     public GameObject tilePrefab;
     public GameObject piecePrefab;
 
@@ -52,6 +54,12 @@ public class Manager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    public void Pause()
+    {
+        SaveManager.save();
+        SceneManager.LoadSceneAsync("Pause Menu");
     }
 
     public GameObject createTile()

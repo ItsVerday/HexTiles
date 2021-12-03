@@ -22,6 +22,7 @@ public class Piece : MonoBehaviour
 
     void Awake()
     {
+        transform.localScale = new Vector3(0, 0, 0);
         scaleIn = TweenFactory.Tween(null, new Vector3(0, 0, 0), new Vector3(1, 1, 1), 0.3f, TweenScaleFunctions.CubicEaseOut, t =>
         {
             if (this == null)
