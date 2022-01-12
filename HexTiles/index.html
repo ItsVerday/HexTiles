@@ -8,7 +8,7 @@
   </head>
   <body style="text-align: center; margin: 0px; overflow: hidden; background-color: #182028;">
     <canvas id="unity-canvas" style="width: 100vw; height: 100vh; background: #182028;"></canvas>
-    <script src="HexTiles/Build/HexTiles.loader.js"></script>
+    <script src="./Build/HexTiles.loader.js"></script>
     <script>
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         // Mobile device style: fill the whole browser client area with the game canvas:
@@ -19,9 +19,9 @@
       }
 
       createUnityInstance(document.querySelector("#unity-canvas"), {
-        dataUrl: "HexTiles/Build/HexTiles.data",
-        frameworkUrl: "HexTiles/Build/HexTiles.framework.js",
-        codeUrl: "HexTiles/Build/HexTiles.wasm",
+        dataUrl: "./Build/HexTiles.data",
+        frameworkUrl: "./Build/HexTiles.framework.js",
+        codeUrl: "./Build/HexTiles.wasm",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Valgo",
         productName: "Hex Tiles",
