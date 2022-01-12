@@ -98,34 +98,91 @@ public class Manager : MonoBehaviour
         new Color(97 / 255f, 35 / 255f, 181 / 255f)
     };
 
-    public static List<Color> END_PIECE_COLORS = new List<Color>()
-    {
-        new Color(58 / 255f, 47 / 255f, 140 / 255f),
-        new Color(21 / 255f, 110 / 255f, 101 / 255f),
-        new Color(227 / 255f, 85 / 255f, 39 / 255f),
-        new Color(166 / 255f, 41 / 255f, 79 / 255f),
-        new Color(240 / 255f, 158 / 255f, 236 / 255f),
-        new Color(100 / 255f, 29 / 255f, 171 / 255f),
-        new Color(255 / 255f, 232 / 255f, 120 / 255f),
-        new Color(56 / 255f, 217 / 255f, 121 / 255f),
-        new Color(216 / 255f, 221 / 255f, 227 / 255f),
-        new Color(170 / 255f, 242 / 255f, 211 / 255f),
-        new Color(174 / 255f, 141 / 255f, 214 / 255f),
-        new Color(246 / 255f, 166 / 255f, 175 / 255f)
-    };
+    public static List<Color> DARK_PIECE_COLORS = new List<Color>();
 
-    public Color getPieceColor(int number)
+    public static RNG rng = new RNG(12321);
+
+    public Color generatePieceColor()
     {
-        float blend = Mathf.Floor((number - 1) / PIECE_COLORS.Count);
-        int numberMod = (number - 1) % PIECE_COLORS.Count;
-        blend %= 5;
-        blend /= 4;
-        Color lerped = PIECE_COLORS[numberMod] * (1 - blend) + END_PIECE_COLORS[numberMod] * blend;
-        float h, s, v;
-        Color.RGBToHSV(lerped, out h, out s, out v);
-        h += 0.618f * 0.25f * (number / 60);
-        h %= 1;
-        return Color.HSVToRGB(h, s, v);
+        double H = rng.nextDouble() * 360d;
+        double S;
+        if (rng.nextDouble() < 0.9f)
+        {
+            S = (double) Mathf.Sqrt(Mathf.Sqrt(Mathf.Sqrt((float) rng.nextDouble()))) * 20d + 80d;
+        }
+        else
+        {
+            S = rng.nextDouble() * 80d;
+        }
+
+        double L = rng.nextGaussian() * 15d + 55d;
+        if (L > 100d)
+        {
+            L = 100d;
+        }
+
+        if (L < 25d)
+        {
+            L = 25d;
+        }
+
+        float r, g, b;
+        ColorUtils.Main.HSLuv2RGB((float) H, (float) S, (float) L, out r, out g, out b);
+        return new Color(r, g, b);
+    }
+
+    public Color pickPieceColor()
+    {
+        int i = 1000;
+        while (i-- > 0)
+        {
+            Color tryColor = generatePieceColor();
+            if (ColorUtils.Main.colorDistance(tryColor, new Color(24 / 255f, 32 / 255f, 40 / 255f)) < 15f) continue;
+
+            int c = PIECE_COLORS.Count - 1;
+            float a = 1f;
+            bool tooClose = false;
+
+            while (c >= 0)
+            {
+                Color comp = PIECE_COLORS[c--];
+                if (ColorUtils.Main.colorDistance(tryColor, comp) < Mathf.Sqrt(a) * 23f)
+                {
+                    tooClose = true;
+                    break;
+                }
+
+                a -= 0.05f;
+            }
+
+            if (tooClose) continue;
+
+            return tryColor;
+        }
+
+        return Color.black;
+    }
+
+    public void getPieceColors(int number, out Color light, out Color dark)
+    {
+        while (PIECE_COLORS.Count < number)
+        {
+            PIECE_COLORS.Add(pickPieceColor());
+        }
+
+        while (DARK_PIECE_COLORS.Count < PIECE_COLORS.Count)
+        {
+            Color? darker = ColorUtils.Main.darkenColor(3f, PIECE_COLORS[DARK_PIECE_COLORS.Count]);
+            if (darker == null)
+            {
+                darker = new Color(0f, 0f, 0f);
+            }
+
+            DARK_PIECE_COLORS.Add((Color) darker);
+        }
+
+        light = PIECE_COLORS[number - 1];
+        dark = DARK_PIECE_COLORS[number - 1];
     }
 
     public static List<Color> COMBO_COLORS = new List<Color>()
@@ -293,8 +350,8 @@ public class Manager : MonoBehaviour
 
         public void updateDisplay(GameObject top, GameObject sides, TextMeshPro text)
         {
-            Color color = getColor();
-            Color darker = new Color(color.r * 0.75f, color.g * 0.75f, color.b * 0.75f);
+            Color color, darker;
+            getColors(out color, out darker);
             top.GetComponent<SpriteRenderer>().color = color;
             sides.GetComponent<SpriteRenderer>().color = darker;
             text.color = darker;
@@ -311,14 +368,15 @@ public class Manager : MonoBehaviour
             return number.ToString();
         }
 
-        public Color getColor()
+        public void getColors(out Color light, out Color dark)
         {
             if (number < 1)
             {
-                return Color.red;
+                light = Color.red;
+                dark = new Color(light.r * 0.75f, light.g * 0.75f, light.b * 0.75f);
             }
 
-            return instance.getPieceColor(number);
+            instance.getPieceColors(number, out light, out dark);
         }
     }
 
@@ -424,8 +482,8 @@ public class Manager : MonoBehaviour
 
         public void updateDisplay(GameObject top, GameObject sides, TextMeshPro text, SpriteRenderer bombSprite)
         {
-            Color color = getColor();
-            Color darker = new Color(color.r * 0.75f, color.g * 0.75f, color.b * 0.75f);
+            Color color, darker;
+            getColors(out color, out darker);
             top.GetComponent<SpriteRenderer>().color = color;
             sides.GetComponent<SpriteRenderer>().color = darker;
             text.color = darker;
@@ -443,14 +501,15 @@ public class Manager : MonoBehaviour
             return number.ToString();
         }
 
-        public Color getColor()
+        public void getColors(out Color light, out Color dark)
         {
             if (number < 1)
             {
-                return Color.red;
+                light = Color.red;
+                dark = new Color(light.r * 0.75f, light.g * 0.75f, light.b * 0.75f);
             }
 
-            return instance.getPieceColor(number);
+            instance.getPieceColors(number, out light, out dark);
         }
 
         public override PieceType clone()

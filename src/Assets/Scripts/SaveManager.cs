@@ -177,7 +177,8 @@ public class SaveManager : MonoBehaviour
         board.comboManager.comboTime = serializableBoard.comboTime;
 
         board.displayScore = board.score;
-        board.scoreColor = Manager.instance.getPieceColor(board.highest);
+        Color na = new Color();
+        Manager.instance.getPieceColors(board.highest, out board.scoreColor, out na);
         board.comboManager.scale = board.comboManager.combo > 0 ? 1 : 0;
         board.comboManager.displayComboTime = serializableBoard.comboTime;
         board.comboManager.comboColor = Manager.instance.getComboColor(Mathf.Max(board.comboManager.combo, 1));

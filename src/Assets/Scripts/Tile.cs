@@ -21,6 +21,11 @@ public class Tile : MonoBehaviour
 
     public void setPiece(GameObject piece)
     {
+        if (piece != null)
+        {
+            unsetPiece();
+        }
+
         this.piece = piece;
         Piece pieceComponent = piece.GetComponent<Piece>();
         pieceComponent.tile = this;

@@ -103,6 +103,17 @@ public class Board : MonoBehaviour
             Debug.Log("Error loading save");
             newGame();
         }
+
+        /*
+        // For testing purposes
+        int i = 1;
+        foreach (GameObject gameObject in tiles)
+        {
+            Tile tile = gameObject.GetComponent<Tile>();
+            tile.unsetPiece();
+            tile.setPiece(createPiece(i++));
+        }
+        */
     }
     
     public void newGame()
@@ -140,7 +151,9 @@ public class Board : MonoBehaviour
         }
 
         float scoreColorLerp = 1.0f - Mathf.Pow(1.0f - 0.999f, Time.deltaTime);
-        scoreColor = scoreColor * (1.0f - scoreColorLerp) + Manager.instance.getPieceColor(highest) * scoreColorLerp;
+        Color pieceColor, na = new Color();
+        Manager.instance.getPieceColors(highest, out pieceColor, out na);
+        scoreColor = scoreColor * (1.0f - scoreColorLerp) + pieceColor * scoreColorLerp;
 
         scoreText.text = string.Format("{0:#,##0.##}", Math.Floor(displayScore));
         scoreText.color = scoreColor;
@@ -379,7 +392,6 @@ public class Board : MonoBehaviour
 
                     if (neighborAheadTile != null && neighborAheadPiece != null && canMerge(pieceType, neighborAheadPieceType) && (neighborBehindTile == null || neighborBehindPiece == null || !canMerge(pieceType, neighborBehindPieceType)))
                     {
-
                         change = true;
 
                         neighborAheadPiece.merge = piece.merge + 1;
@@ -480,7 +492,7 @@ public class Board : MonoBehaviour
                     Destroy(piece);
 
                     newPieceComponent.clearAnimations();
-                    newPieceComponent.mergeAnimation = TweenFactory.Tween(null, new Vector3(1.15f, 1.15f, 1.15f), new Vector3(1, 1, 1), 0.2f, TweenScaleFunctions.QuadraticEaseIn, t =>
+                    newPieceComponent.mergeAnimation = TweenFactory.Tween(null, new Vector3(1.15f, 1.15f, 1.15f), new Vector3(1f, 1f, 1f), 0.2f, TweenScaleFunctions.QuadraticEaseIn, t =>
                     {
                         if (newPiece == null)
                         {

@@ -100,7 +100,7 @@ public class ControlManager : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            Vector2 delta = (Vector2)Input.mousePosition - touchStart;
+            Vector2 delta = (Vector2) Input.mousePosition - touchStart;
             touchControlsDelta(delta);
         }
     }

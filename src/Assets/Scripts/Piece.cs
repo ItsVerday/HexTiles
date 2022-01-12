@@ -59,6 +59,13 @@ public class Piece : MonoBehaviour
         moveWhenMergeAnimation?.Stop(TweenStopBehavior.Complete);
         scaleOutWhenMergeAnimation?.Stop(TweenStopBehavior.Complete);
         offsetAnimation?.Stop(TweenStopBehavior.Complete);
+        Vector3 scale = new Vector3(1, 1, 1);
+        if (tile == null)
+        {
+            scale *= Manager.instance.tileScale;
+        }
+
+        transform.localScale = scale;
     }
 
     public void explode()
