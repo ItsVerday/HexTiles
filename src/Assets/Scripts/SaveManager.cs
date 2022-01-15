@@ -132,6 +132,7 @@ public class SaveManager : MonoBehaviour
 
         serializableBoard.score = board.score;
         serializableBoard.highestTile = board.highest;
+        serializableBoard.spawningScore = board.spawningScore;
         serializableBoard.combo = board.comboManager.combo;
         serializableBoard.comboTime = board.comboManager.comboTime;
         serializableBoard.canMakeMove = board.canMakeMove();
@@ -173,6 +174,7 @@ public class SaveManager : MonoBehaviour
 
         board.score = serializableBoard.score;
         board.highest = serializableBoard.highestTile;
+        board.spawningScore = serializableBoard.spawningScore;
         board.comboManager.combo = serializableBoard.combo;
         board.comboManager.comboTime = serializableBoard.comboTime;
 
@@ -192,6 +194,7 @@ public class SaveManager : MonoBehaviour
         public SerializablePieceType[] pieces;
         public long score;
         public int highestTile;
+        public float spawningScore;
         public int combo;
         public float comboTime;
         public bool canMakeMove;

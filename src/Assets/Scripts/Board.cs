@@ -22,6 +22,7 @@ public class Board : MonoBehaviour
     public Dictionary<Vector2Int, GameObject> tileGrid = new Dictionary<Vector2Int, GameObject>();
 
     public int highest = 1;
+    public float spawningScore = 1f;
     public long score = 0;
     public double displayScore = 0;
     public Color scoreColor = Manager.PIECE_COLORS[0];
@@ -249,7 +250,7 @@ public class Board : MonoBehaviour
 
         if (!merge(direction, didCompress) && !didCompress)
         {
-            afterMove();
+            afterMove(false);
             return;
         }
         else
@@ -257,8 +258,7 @@ public class Board : MonoBehaviour
             playImpact();
         }
 
-        placeRandomPiece();
-        afterMove();
+        afterMove(true);
     }
 
     public void saveOldPositions()
@@ -275,7 +275,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void afterMove()
+    public void afterMove(bool success)
     {
         foreach (GameObject gameObject in tiles)
         {
@@ -301,6 +301,17 @@ public class Board : MonoBehaviour
                     }
                 }
             }
+        }
+
+        if (success)
+        {
+            if (highest > spawningScore)
+            {
+                spawningScore = highest;
+            }
+
+            spawningScore += Manager.instance.gameMode.getProgressionSpeed();
+            placeRandomPiece();
         }
 
         save();

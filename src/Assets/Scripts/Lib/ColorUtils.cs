@@ -47,25 +47,22 @@ namespace ColorUtils
 			return colorDistanceRGB(r1, g1, b1, r2, g2, b2);
 		}
 
-		public static bool darken(double threshold, float inH, float inS, float inL, out float outH, out float outS, out float outL)
+		public static bool darken(double threshold, float inH, float inS, float inL, float cmpH, float cmpS, float cmpL, out float outH, out float outS, out float outL)
         {
-			float tryH = inH;
-			float tryS = inS;
-			float tryL = inL;
 			outH = 0f;
 			outS = 0f;
 			outL = 0f;
-			while (tryL >= 0)
+			while (inL >= 0)
             {
-				if (colorDistanceHSLuv(inH, inS, inL, tryH, tryS, tryL) >= threshold)
+				if (colorDistanceHSLuv(inH, inS, inL, cmpH, cmpS, cmpL) >= threshold)
                 {
-					outH = tryH;
-					outS = tryS;
-					outL = tryL;
+					outH = inH;
+					outS = inS;
+					outL = inL;
 					return true;
                 }
             
-				tryL -= 1f;
+				inL -= 1f;
 			}
 
 			return false;
@@ -74,9 +71,9 @@ namespace ColorUtils
 		public static Color? darkenColor(double threshold, Color toDarken)
         {
 			float h, s, l;
-			RGB2HSLuv(toDarken.r, toDarken.g, toDarken.b, out h, out s, out l);
+			RGB2HSLuv(toDarken.r * 0.8f, toDarken.g * 0.85f, toDarken.b * 0.95f, out h, out s, out l);
 			float darkH, darkS, darkL;
-            bool success = darken(threshold, h, s, l, out darkH, out darkS, out darkL);
+            bool success = darken(threshold, h, s, l, h, s, l, out darkH, out darkS, out darkL);
 			if (!success)
 			{
 				return null;
@@ -84,7 +81,7 @@ namespace ColorUtils
 
 			float finalR, finalG, finalB;
 			HSLuv2RGB(darkH, darkS, darkL, out finalR, out finalG, out finalB);
-			return new Color(finalR * 0.75f, finalG * 0.8f, finalB * 0.85f);
+			return new Color(finalR, finalG, finalB);
 		}
 	}
 

@@ -1197,6 +1197,7 @@ MonoBehaviour:
   forceNewSave: 0
   tiles: []
   highest: 1
+  spawningScore: 1
   score: 0
   displayScore: 0
   scoreColor: {r: 0.09411765, g: 0.5764706, b: 0.827451, a: 1}

@@ -17,7 +17,7 @@ public class Manager : MonoBehaviour
     public GameObject incrementerPiecePrefab;
 
     public Board board;
-    public GameMode gameMode = new NormalGameMode();
+    public GameMode gameMode = new ZenGameMode();
 
     public int boardSize;
     public float tileScale;
@@ -78,6 +78,7 @@ public class Manager : MonoBehaviour
         GameObject piece = Instantiate(piecePrefab);
         Piece pieceComponent = piece.GetComponent<Piece>();
         pieceComponent.pieceType = pieceType;
+        pieceComponent.board = board;
 
         return piece;
     }
@@ -100,12 +101,12 @@ public class Manager : MonoBehaviour
 
     public static List<Color> DARK_PIECE_COLORS = new List<Color>();
 
-    public static RNG rng = new RNG(12321);
+    public static List<double> recentHues = new List<double>();
+    public static RNG rng = new RNG(12345);
 
-    public Color generatePieceColor()
+    public void generatePieceColor(out double H, out double S, out double L)
     {
-        double H = rng.nextDouble() * 360d;
-        double S;
+        H = rng.nextDouble() * 360d;
         if (rng.nextDouble() < 0.9f)
         {
             S = (double) Mathf.Sqrt(Mathf.Sqrt(Mathf.Sqrt((float) rng.nextDouble()))) * 20d + 80d;
@@ -115,7 +116,7 @@ public class Manager : MonoBehaviour
             S = rng.nextDouble() * 80d;
         }
 
-        double L = rng.nextGaussian() * 15d + 55d;
+        L = rng.nextGaussian() * 15d + 55d;
         if (L > 100d)
         {
             L = 100d;
@@ -125,10 +126,6 @@ public class Manager : MonoBehaviour
         {
             L = 25d;
         }
-
-        float r, g, b;
-        ColorUtils.Main.HSLuv2RGB((float) H, (float) S, (float) L, out r, out g, out b);
-        return new Color(r, g, b);
     }
 
     public Color pickPieceColor()
@@ -136,7 +133,28 @@ public class Manager : MonoBehaviour
         int i = 1000;
         while (i-- > 0)
         {
-            Color tryColor = generatePieceColor();
+            double H, S, L;
+            float r, g, b;
+            generatePieceColor(out H, out S, out L);
+
+            bool badHue = false;
+            foreach (double recentHue in recentHues)
+            {
+                if (Mathf.Min(Mathf.Abs((float) (H - recentHue)), Mathf.Min(Mathf.Abs((float) (H - recentHue + 360)), Mathf.Abs((float) (H - recentHue - 360)))) < 15f)
+                {
+                    badHue = true;
+                    break;
+                }
+            }
+
+            if (badHue)
+            {
+                continue;
+            }
+            
+            ColorUtils.Main.HSLuv2RGB((float) H, (float) S, (float) L, out r, out g, out b);
+            Color tryColor = new Color(r, g, b);
+
             if (ColorUtils.Main.colorDistance(tryColor, new Color(24 / 255f, 32 / 255f, 40 / 255f)) < 15f) continue;
 
             int c = PIECE_COLORS.Count - 1;
@@ -157,10 +175,16 @@ public class Manager : MonoBehaviour
 
             if (tooClose) continue;
 
+            recentHues.Add(H);
+            while (recentHues.Count > 10)
+            {
+                recentHues.RemoveAt(0);
+            }
+
             return tryColor;
         }
 
-        return Color.black;
+        return Color.white;
     }
 
     public void getPieceColors(int number, out Color light, out Color dark)
@@ -172,7 +196,7 @@ public class Manager : MonoBehaviour
 
         while (DARK_PIECE_COLORS.Count < PIECE_COLORS.Count)
         {
-            Color? darker = ColorUtils.Main.darkenColor(3f, PIECE_COLORS[DARK_PIECE_COLORS.Count]);
+            Color? darker = ColorUtils.Main.darkenColor(5f, PIECE_COLORS[DARK_PIECE_COLORS.Count]);
             if (darker == null)
             {
                 darker = new Color(0f, 0f, 0f);
@@ -583,6 +607,7 @@ public class Manager : MonoBehaviour
         public abstract PieceType spawnPiece(Board board);
         public abstract float getComboTime(int combo);
         public abstract float getComboMultiplier(int combo);
+        public abstract float getProgressionSpeed();
     }
 
     public class NormalGameMode : GameMode
@@ -594,58 +619,63 @@ public class Manager : MonoBehaviour
 
         public override PieceType spawnPiece(Board board)
         {
+            float spawningScore = board.spawningScore;
             float highest = board.highest;
-            float f = highest - 0.5f * Mathf.Pow(Mathf.Log(highest), 1.1f);
-            float rangeLow = Mathf.Floor(f - 0.4f * Mathf.Pow(f, 0.47f));
-            float rangeHigh = Mathf.Ceil(f);
-            int number = (int) Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
+            float span = Mathf.Pow(spawningScore, 0.5f) * 0.5f + 2f;
+            float rangeHigh = spawningScore - Mathf.Pow(spawningScore, 0.35f) * 0.4f;
+            float rangeLow = rangeHigh - span;
+            int number = (int)Mathf.Max((Random.value + Random.value) * 0.5f * (rangeHigh - rangeLow) + rangeLow, 1f);
 
-            Vector2Int lowestPiece = board.lowestPieceCount();
-            if (lowestPiece.x < rangeLow && lowestPiece.y == 1)
+            if (Random.value < 0.5f)
             {
-                if (Random.value < (rangeLow - lowestPiece.x) * 0.05f)
+                // Add a 2nd lowest number if another one can't spawn.
+                Vector2Int lowestPiece = board.lowestPieceCount();
+                if (lowestPiece.x < rangeLow && lowestPiece.y == 1)
                 {
-                    number = lowestPiece.x;
+                    if (Random.value < (rangeLow - lowestPiece.x) * 0.05f)
+                    {
+                        number = lowestPiece.x;
+                    }
                 }
             }
 
             PieceType pieceType = new StandardPieceType(number);
 
-            if (Random.value < 0.045f && highest >= 40)
+            if (Random.value < 0.055f && highest >= 23)
             {
                 pieceType = new BombPieceType(number);
             }
-            else if (Random.value < 0.035f && highest >= 20)
+            else if (Random.value < 0.045f && highest >= 17)
             {
                 pieceType = new BombPieceType(number);
             }
-            else if (Random.value < 0.025f && highest >= 12)
+            else if (Random.value < 0.035f && highest >= 11)
             {
                 pieceType = new BombPieceType(number);
             }
 
-            if (Random.value < 0.16f && highest >= 30)
+            if (Random.value < 0.09f && highest >= 30)
             {
                 pieceType = new WallPieceType();
             }
-            else if (Random.value < 0.13f && highest >= 18)
+            else if (Random.value < 0.075f && highest >= 18)
             {
                 pieceType = new WallPieceType();
             }
-            else if (Random.value < 0.1f && highest >= 7)
+            else if (Random.value < 0.06f && highest >= 7)
             {
                 pieceType = new WallPieceType();
             }
 
-            if (Random.value < 0.1f && highest >= 50)
+            if (Random.value < 0.045f && highest >= 50)
             {
                 pieceType = new IncrementerPieceType();
             }
-            else if (Random.value < 0.07f && highest >= 35)
+            else if (Random.value < 0.035f && highest >= 35)
             {
                 pieceType = new IncrementerPieceType();
             }
-            else if (Random.value < 0.04f && highest >= 19)
+            else if (Random.value < 0.025f && highest >= 17)
             {
                 pieceType = new IncrementerPieceType();
             }
@@ -655,12 +685,17 @@ public class Manager : MonoBehaviour
 
         public override float getComboTime(int combo)
         {
-            return Mathf.Max(4f - combo * 0.1f, 1.5f);
+            return Mathf.Max(5f - combo * 0.1f, 1.5f);
         }
 
         public override float getComboMultiplier(int combo)
         {
             return Mathf.Min(Mathf.Pow(combo + 1f, 0.5f), 15f);
+        }
+
+        public override float getProgressionSpeed()
+        {
+            return 0.01f;
         }
     }
 
@@ -673,32 +708,46 @@ public class Manager : MonoBehaviour
 
         public override PieceType spawnPiece(Board board)
         {
-            float highest = board.highest * 0.9f;
-            float f = highest - 0.6f * Mathf.Pow(Mathf.Log(highest), 1.3f);
-            float rangeLow = Mathf.Floor(f - 0.5f * Mathf.Pow(f, 0.49f));
-            float rangeHigh = Mathf.Ceil(f);
-            int number = (int) Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
+            float spawningScore = board.spawningScore;
+            float highest = board.highest;
+            float span = Mathf.Pow(spawningScore, 0.55f) * 0.6f + 1f;
+            float rangeHigh = spawningScore - Mathf.Pow(spawningScore, 0.4f) * 0.4f;
+            float rangeLow = rangeHigh - span;
+            int number = (int) Mathf.Max((Random.value + Random.value) * 0.5f * (rangeHigh - rangeLow) + rangeLow, 1f);
+
+            if (Random.value < 0.25f)
+            {
+                // Add a 2nd lowest number if another one can't spawn.
+                Vector2Int lowestPiece = board.lowestPieceCount();
+                if (lowestPiece.x < rangeLow && lowestPiece.y == 1)
+                {
+                    if (Random.value < (rangeLow - lowestPiece.x) * 0.02f)
+                    {
+                        number = lowestPiece.x;
+                    }
+                }
+            }
 
             PieceType pieceType = new StandardPieceType(number);
 
-            if (Random.value < 0.04f && highest >= 25)
+            if (Random.value < 0.05f && highest >= 25)
             {
                 pieceType = new BombPieceType(number);
             }
-            else if (Random.value < 0.03f && highest >= 14)
+            else if (Random.value < 0.04f && highest >= 18)
             {
                 pieceType = new BombPieceType(number);
             }
-            else if (Random.value < 0.02f && highest >= 9)
+            else if (Random.value < 0.03f && highest >= 12)
             {
                 pieceType = new BombPieceType(number);
             }
 
-            if (Random.value < 0.15f && highest >= 20)
+            if (Random.value < 0.12f && highest >= 20)
             {
                 pieceType = new WallPieceType();
             }
-            else if (Random.value < 0.11f && highest >= 11)
+            else if (Random.value < 0.1f && highest >= 11)
             {
                 pieceType = new WallPieceType();
             }
@@ -707,15 +756,15 @@ public class Manager : MonoBehaviour
                 pieceType = new WallPieceType();
             }
 
-            if (Random.value < 0.05f && highest >= 40)
+            if (Random.value < 0.04f && highest >= 75)
             {
                 pieceType = new IncrementerPieceType();
             }
-            else if (Random.value < 0.035f && highest >= 29)
+            else if (Random.value < 0.03f && highest >= 50)
             {
                 pieceType = new IncrementerPieceType();
             }
-            else if (Random.value < 0.02f && highest >= 20)
+            else if (Random.value < 0.02f && highest >= 25)
             {
                 pieceType = new IncrementerPieceType();
             }
@@ -725,12 +774,17 @@ public class Manager : MonoBehaviour
 
         public override float getComboTime(int combo)
         {
-            return 3.5f * Mathf.Pow(0.95f, combo);
+            return Mathf.Max(3.5f * Mathf.Pow(0.95f, combo), 0.5f);
         }
 
         public override float getComboMultiplier(int combo)
         {
-            return Mathf.Min(Mathf.Pow(combo + 1f, 0.7f), 20f);
+            return Mathf.Min(Mathf.Pow(combo + 1f, 0.6f), 20f);
+        }
+
+        public override float getProgressionSpeed()
+        {
+            return 0.005f;
         }
     }
 
@@ -743,58 +797,63 @@ public class Manager : MonoBehaviour
 
         public override PieceType spawnPiece(Board board)
         {
+            float spawningScore = board.spawningScore;
             float highest = board.highest;
-            float f = highest - 0.4f * Mathf.Pow(Mathf.Log(highest), 0.75f);
-            float rangeLow = Mathf.Floor(f - 0.3f * Mathf.Pow(f, 0.45f));
-            float rangeHigh = Mathf.Ceil(f);
-            int number = (int) Mathf.Max(Random.Range(rangeLow, rangeHigh), 1f);
+            float span = Mathf.Pow(spawningScore, 0.45f) * 0.4f;
+            float rangeHigh = spawningScore - Mathf.Pow(spawningScore, 0.3f) * 0.4f;
+            float rangeLow = rangeHigh - span;
+            int number = (int) Mathf.Max((Random.value + Random.value) * 0.5f * (rangeHigh - rangeLow) + rangeLow, 1f);
 
-            Vector2Int lowestPiece = board.lowestPieceCount();
-            if (lowestPiece.x < rangeLow && lowestPiece.y == 1)
+            if (Random.value < 0.75f)
             {
-                if (Random.value < (rangeLow - lowestPiece.x) * 0.1f)
+                // Add a 2nd lowest number if another one can't spawn.
+                Vector2Int lowestPiece = board.lowestPieceCount();
+                if (lowestPiece.x < rangeLow && lowestPiece.y == 1)
                 {
-                    number = lowestPiece.x;
+                    if (Random.value < (rangeLow - lowestPiece.x) * 0.1f)
+                    {
+                        number = lowestPiece.x;
+                    }
                 }
             }
 
             PieceType pieceType = new StandardPieceType(number);
 
-            if (Random.value < 0.05f && highest >= 28)
+            if (Random.value < 0.06f && highest >= 20)
             {
                 pieceType = new BombPieceType(number);
             }
-            if (Random.value < 0.04f && highest >= 18)
+            else if (Random.value < 0.05f && highest >= 15)
             {
                 pieceType = new BombPieceType(number);
             }
-            else if (Random.value < 0.03f && highest >= 10)
+            else if (Random.value < 0.04f && highest >= 10)
             {
                 pieceType = new BombPieceType(number);
             }
 
-            if (Random.value < 0.04f && highest >= 30)
+            if (Random.value < 0.05f && highest >= 40)
             {
                 pieceType = new WallPieceType();
             }
-            else if (Random.value < 0.03f && highest >= 20)
+            else if (Random.value < 0.04f && highest >= 25)
             {
                 pieceType = new WallPieceType();
             }
-            else if (Random.value < 0.02f && highest >= 12)
+            else if (Random.value < 0.03f && highest >= 12)
             {
                 pieceType = new WallPieceType();
             }
 
-            if (Random.value < 0.14f && highest >= 40)
+            if (Random.value < 0.05f && highest >= 40)
             {
                 pieceType = new IncrementerPieceType();
             }
-            else if (Random.value < 0.1f && highest >= 25)
+            else if (Random.value < 0.04f && highest >= 25)
             {
                 pieceType = new IncrementerPieceType();
             }
-            else if (Random.value < 0.07f && highest >= 14)
+            else if (Random.value < 0.03f && highest >= 14)
             {
                 pieceType = new IncrementerPieceType();
             }
@@ -804,12 +863,17 @@ public class Manager : MonoBehaviour
 
         public override float getComboTime(int combo)
         {
-            return Mathf.Max(10f - combo * 0.05f, 5f);
+            return Mathf.Max(10f - combo * 0.05f, 3f);
         }
 
         public override float getComboMultiplier(int combo)
         {
-            return Mathf.Min(Mathf.Pow(combo + 1f, 0.3f), 12f);
+            return Mathf.Min(Mathf.Pow(combo + 1f, 0.4f), 12f);
+        }
+
+        public override float getProgressionSpeed()
+        {
+            return 0.015f;
         }
     }
 }

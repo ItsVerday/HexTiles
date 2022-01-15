@@ -18,6 +18,7 @@ public class Piece : MonoBehaviour
     public Vector3 oldPosition = new Vector3(0, 0, 0);
 
     public Tile tile;
+    public Board board;
     public Manager.PieceType pieceType;
 
     void Awake()
@@ -70,11 +71,10 @@ public class Piece : MonoBehaviour
 
     public void explode()
     {
-        clearAnimations();
-
         tile.board.score += (int) Mathf.Floor(pieceType.getPointsForExplode());
         tile.pieceExploded = true;
         tile.unsetPiece();
+        clearAnimations();
 
         TweenFactory.Tween(null, new Vector3(1, 1, 1), new Vector3(0, 0, 0), 0.5f, TweenScaleFunctions.CubicEaseOut, t =>
         {
@@ -88,6 +88,8 @@ public class Piece : MonoBehaviour
             {
                 scale *= Manager.instance.tileScale;
             }
+            
+            scale *= board.transform.localScale.x;
 
             transform.localScale = scale;
         }, t =>
@@ -97,7 +99,7 @@ public class Piece : MonoBehaviour
             }
         });
 
-        Vector2 offset = Random.insideUnitCircle * 2f;
+        Vector2 offset = Random.insideUnitCircle * 3f * board.transform.localScale.x;
         TweenFactory.Tween(null, transform.localPosition, transform.localPosition + (Vector3) offset, 0.5f, TweenScaleFunctions.QuarticEaseOut, t =>
         {
             if (this == null)
